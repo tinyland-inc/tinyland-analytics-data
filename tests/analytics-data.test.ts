@@ -723,12 +723,12 @@ describe('AnalyticsDataService', () => {
 
     it('rounds the result to whole seconds', async () => {
       const ts = Date.now();
-      // s1: 10.5 seconds apart, s2: 20.5 seconds apart => avg = 15.5 => rounds to 16
+      // s1: 11 seconds apart, s2: 21 seconds apart => avg = 16 (no rounding ambiguity)
       const body = makeLokiResponse([
         pageViewEntry(ts, { session_id: 's1' }),
-        pageViewEntry(ts - 10_500, { session_id: 's1' }),
+        pageViewEntry(ts - 11_000, { session_id: 's1' }),
         pageViewEntry(ts, { session_id: 's2' }),
-        pageViewEntry(ts - 20_500, { session_id: 's2' }),
+        pageViewEntry(ts - 21_000, { session_id: 's2' }),
       ]);
       mockFetch.mockResolvedValue(makeOkResponse(body));
       const svc = setupService(mockFetch, logger);
