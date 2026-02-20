@@ -1,5 +1,5 @@
 /**
- * Vitest Configuration for @tinyland-inc/tinyland-analytics-data
+ * Vitest Configuration for @tummycrypt/tinyland-analytics-data
  *
  * Works in three modes:
  *   1. Standalone:  cd packages/tinyland-analytics-data && pnpm test
