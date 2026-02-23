@@ -1,11 +1,11 @@
-/**
- * Vitest Configuration for @tummycrypt/tinyland-analytics-data
- *
- * Works in three modes:
- *   1. Standalone:  cd packages/tinyland-analytics-data && pnpm test
- *   2. Workspace:   vitest run --project=tinyland-analytics-data (from root)
- *   3. Bazel:       bazel test //packages/tinyland-analytics-data:test
- */
+
+
+
+
+
+
+
+
 
 import { defineConfig } from 'vitest/config';
 import { fileURLToPath } from 'node:url';
