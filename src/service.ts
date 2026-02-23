@@ -8,13 +8,13 @@ const defaultLogger: Logger = {
   error: (data, msg) => console.error(msg, data),
 };
 
-/**
- * Service for fetching analytics data from Loki and Prometheus.
- * Replaces local JSON file reading with real observability stack queries.
- *
- * All external dependencies (fetchLoki, logger, URLs) are injected via
- * the package-level configure() function.
- */
+
+
+
+
+
+
+
 export class AnalyticsDataService {
   private lokiUrl: string;
   private prometheusUrl: string;
@@ -29,10 +29,10 @@ export class AnalyticsDataService {
     this.logger = config.logger ?? defaultLogger;
   }
 
-  /**
-   * Query Loki for page views from Alloy -> Loki pipeline.
-   * Uses dedicated page view logging with component="analytics" and event_type="page_view".
-   */
+  
+
+
+
   async getPageViews(timeRange: string = '24h', limit: number = 1000): Promise<PageView[]> {
     try {
       const end = Date.now();
@@ -91,9 +91,9 @@ export class AnalyticsDataService {
     }
   }
 
-  /**
-   * Get top pages by view count.
-   */
+  
+
+
   async getTopPages(
     timeRange: string = '24h',
     limit: number = 10
@@ -122,9 +122,9 @@ export class AnalyticsDataService {
     }
   }
 
-  /**
-   * Get unique visitor count by counting unique session IDs.
-   */
+  
+
+
   async getUniqueVisitors(timeRange: string = '24h'): Promise<number> {
     try {
       const pageViews = await this.getPageViews(timeRange, 10000);
@@ -147,9 +147,9 @@ export class AnalyticsDataService {
     }
   }
 
-  /**
-   * Get active users (sessions in last 5 minutes).
-   */
+  
+
+
   async getActiveUsers(): Promise<number> {
     try {
       const pageViews = await this.getPageViews('5m', 1000);
@@ -171,9 +171,9 @@ export class AnalyticsDataService {
     }
   }
 
-  /**
-   * Calculate average session duration in seconds from Loki session logs.
-   */
+  
+
+
   async getAverageSessionDuration(timeRange: string = '24h'): Promise<number> {
     try {
       const pageViews = await this.getPageViews(timeRange, 10000);
@@ -212,9 +212,9 @@ export class AnalyticsDataService {
     }
   }
 
-  /**
-   * Calculate bounce rate (percentage of single-page sessions).
-   */
+  
+
+
   async getBounceRate(timeRange: string = '24h'): Promise<number> {
     try {
       const pageViews = await this.getPageViews(timeRange, 10000);
@@ -244,9 +244,9 @@ export class AnalyticsDataService {
     }
   }
 
-  /**
-   * Get traffic sources based on referrer data.
-   */
+  
+
+
   async getTrafficSources(
     timeRange: string = '24h',
     limit: number = 10
@@ -302,9 +302,9 @@ export class AnalyticsDataService {
     }
   }
 
-  /**
-   * Get analytics summary metrics.
-   */
+  
+
+
   async getAnalyticsMetrics(timeRange: string = '24h'): Promise<AnalyticsMetrics> {
     try {
       const [pageViews, topPages, uniqueVisitors, avgDuration, bounceRate] =
@@ -339,16 +339,16 @@ export class AnalyticsDataService {
   }
 }
 
-/**
- * Singleton instance of the analytics data service.
- * Requires configure() to have been called before instantiation.
- */
+
+
+
+
 export let analyticsDataService: AnalyticsDataService;
 
-/**
- * Initialize the singleton service instance.
- * Call this after configure() to create the service.
- */
+
+
+
+
 export function createAnalyticsDataService(): AnalyticsDataService {
   analyticsDataService = new AnalyticsDataService();
   return analyticsDataService;

@@ -1,9 +1,9 @@
 import type { Logger } from './types.js';
 
-/**
- * Parse a time range string (e.g. '24h', '5m', '30s', '7d') into milliseconds.
- * Returns 24 hours in milliseconds for invalid formats.
- */
+
+
+
+
 export function parseTimeRange(timeRange: string, logger?: Logger): number {
   const match = timeRange.match(/^(\d+)([smhd])$/);
   if (!match) {
