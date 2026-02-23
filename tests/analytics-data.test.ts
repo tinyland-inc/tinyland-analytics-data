@@ -9,9 +9,9 @@ import {
 } from '../src/index.js';
 import type { AnalyticsDataConfig, FetchResponse, Logger } from '../src/index.js';
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+
+
+
 
 function createMockLogger(): Logger {
   return {
@@ -49,7 +49,7 @@ function makeErrorResponse(status: number, statusText: string): FetchResponse {
   };
 }
 
-/** Nanosecond-style Loki timestamp from a JS timestamp in ms. */
+
 function nanoTs(ms: number): string {
   return `${ms}000000`;
 }
@@ -81,9 +81,9 @@ function setupService(
   return new AnalyticsDataService();
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
+
+
+
 
 describe('configure / getConfig / resetConfig', () => {
   afterEach(() => resetConfig());
@@ -151,7 +151,7 @@ describe('configure / getConfig / resetConfig', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
+
 
 describe('parseTimeRange', () => {
   it('parses seconds', () => {
@@ -212,7 +212,7 @@ describe('parseTimeRange', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
+
 
 describe('AnalyticsDataService', () => {
   let mockFetch: ReturnType<typeof vi.fn>;
@@ -225,9 +225,9 @@ describe('AnalyticsDataService', () => {
 
   afterEach(() => resetConfig());
 
-  // -------------------------------------------------------------------------
-  // Constructor
-  // -------------------------------------------------------------------------
+  
+  
+  
 
   describe('constructor', () => {
     it('throws if configure has not been called', () => {
@@ -251,9 +251,9 @@ describe('AnalyticsDataService', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // createAnalyticsDataService
-  // -------------------------------------------------------------------------
+  
+  
+  
 
   describe('createAnalyticsDataService', () => {
     it('creates and returns a singleton', () => {
@@ -268,9 +268,9 @@ describe('AnalyticsDataService', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // getPageViews
-  // -------------------------------------------------------------------------
+  
+  
+  
 
   describe('getPageViews', () => {
     it('parses a successful Loki response', async () => {
@@ -436,9 +436,9 @@ describe('AnalyticsDataService', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // getTopPages
-  // -------------------------------------------------------------------------
+  
+  
+  
 
   describe('getTopPages', () => {
     it('aggregates page view counts correctly', async () => {
@@ -505,9 +505,9 @@ describe('AnalyticsDataService', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // getUniqueVisitors
-  // -------------------------------------------------------------------------
+  
+  
+  
 
   describe('getUniqueVisitors', () => {
     it('counts unique sessionIds', async () => {
@@ -576,15 +576,15 @@ describe('AnalyticsDataService', () => {
       mockFetch.mockResolvedValue(makeOkResponse(body));
       const svc = setupService(mockFetch, logger);
 
-      // sessionId takes precedence, so both map to 's1'
+      
       const count = await svc.getUniqueVisitors();
       expect(count).toBe(1);
     });
   });
 
-  // -------------------------------------------------------------------------
-  // getActiveUsers
-  // -------------------------------------------------------------------------
+  
+  
+  
 
   describe('getActiveUsers', () => {
     it('counts unique sessions from 5m window', async () => {
@@ -641,14 +641,14 @@ describe('AnalyticsDataService', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // getAverageSessionDuration
-  // -------------------------------------------------------------------------
+  
+  
+  
 
   describe('getAverageSessionDuration', () => {
     it('calculates average duration for multi-page sessions', async () => {
       const ts = Date.now();
-      // Session s1: 10 seconds apart; Session s2: 20 seconds apart
+      
       const body = makeLokiResponse([
         pageViewEntry(ts, { session_id: 's1' }),
         pageViewEntry(ts - 10_000, { session_id: 's1' }),
@@ -659,7 +659,7 @@ describe('AnalyticsDataService', () => {
       const svc = setupService(mockFetch, logger);
 
       const duration = await svc.getAverageSessionDuration();
-      // s1 = 10s, s2 = 20s, average = 15s
+      
       expect(duration).toBe(15);
     });
 
@@ -673,7 +673,7 @@ describe('AnalyticsDataService', () => {
       const svc = setupService(mockFetch, logger);
 
       const duration = await svc.getAverageSessionDuration();
-      // Each session has one page view, so first == last, duration = 0
+      
       expect(duration).toBe(0);
     });
 
@@ -717,13 +717,13 @@ describe('AnalyticsDataService', () => {
       const svc = setupService(mockFetch, logger);
 
       const duration = await svc.getAverageSessionDuration();
-      // Only one session: duration = 30s
+      
       expect(duration).toBe(30);
     });
 
     it('rounds the result to whole seconds', async () => {
       const ts = Date.now();
-      // s1: 11 seconds apart, s2: 21 seconds apart => avg = 16 (no rounding ambiguity)
+      
       const body = makeLokiResponse([
         pageViewEntry(ts, { session_id: 's1' }),
         pageViewEntry(ts - 11_000, { session_id: 's1' }),
@@ -738,9 +738,9 @@ describe('AnalyticsDataService', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // getBounceRate
-  // -------------------------------------------------------------------------
+  
+  
+  
 
   describe('getBounceRate', () => {
     it('returns 100% when all sessions are single-page (all bounce)', async () => {
@@ -774,7 +774,7 @@ describe('AnalyticsDataService', () => {
 
     it('returns correct mixed bounce rate', async () => {
       const ts = Date.now();
-      // s1: 2 pages (not bounce), s2: 1 page (bounce), s3: 1 page (bounce)
+      
       const body = makeLokiResponse([
         pageViewEntry(ts, { session_id: 's1', path: '/' }),
         pageViewEntry(ts - 1000, { session_id: 's1', path: '/about' }),
@@ -785,7 +785,7 @@ describe('AnalyticsDataService', () => {
       const svc = setupService(mockFetch, logger);
 
       const rate = await svc.getBounceRate();
-      // 2 bounces out of 3 sessions = 67%
+      
       expect(rate).toBe(67);
     });
 
@@ -820,7 +820,7 @@ describe('AnalyticsDataService', () => {
 
     it('rounds the percentage to nearest integer', async () => {
       const ts = Date.now();
-      // s1: bounce, s2: bounce, s3: not bounce => 2/3 = 66.666...% => 67
+      
       const body = makeLokiResponse([
         pageViewEntry(ts, { session_id: 's1' }),
         pageViewEntry(ts - 1000, { session_id: 's2' }),
@@ -835,9 +835,9 @@ describe('AnalyticsDataService', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // getTrafficSources
-  // -------------------------------------------------------------------------
+  
+  
+  
 
   describe('getTrafficSources', () => {
     it('categorizes Google referrer', async () => {
@@ -1044,9 +1044,9 @@ describe('AnalyticsDataService', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // getAnalyticsMetrics
-  // -------------------------------------------------------------------------
+  
+  
+  
 
   describe('getAnalyticsMetrics', () => {
     it('returns aggregated metrics', async () => {
@@ -1101,8 +1101,8 @@ describe('AnalyticsDataService', () => {
       const svc = setupService(mockFetch, logger);
 
       await svc.getAnalyticsMetrics('7d');
-      // getAnalyticsMetrics calls 5 methods that each call getPageViews
-      // all should use the passed timeRange
+      
+      
       const calls = (logger.info as ReturnType<typeof vi.fn>).mock.calls;
       const fetchCalls = calls.filter(
         (c: unknown[]) => c[1] === 'Fetching page views from Loki'
@@ -1113,8 +1113,8 @@ describe('AnalyticsDataService', () => {
     });
 
     it('handles partial failures gracefully (individual methods catch errors)', async () => {
-      // getPageViews returns [] on error, so other aggregators get []
-      // This means all values should be 0/empty but the call should not throw
+      
+      
       mockFetch.mockResolvedValue(makeErrorResponse(500, 'Internal Server Error'));
       const svc = setupService(mockFetch, logger);
 
@@ -1127,9 +1127,9 @@ describe('AnalyticsDataService', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Error handling
-  // -------------------------------------------------------------------------
+  
+  
+  
 
   describe('error handling', () => {
     it('logs error when fetch throws an Error object', async () => {
@@ -1186,8 +1186,8 @@ describe('AnalyticsDataService', () => {
       const svc = setupService(mockFetch, logger);
 
       await svc.getTopPages();
-      // getPageViews catches its own error and returns [], then getTopPages proceeds normally with []
-      // But the error from getPageViews is logged
+      
+      
       expect(logger.error).toHaveBeenCalled();
     });
 
@@ -1232,9 +1232,9 @@ describe('AnalyticsDataService', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Logger integration
-  // -------------------------------------------------------------------------
+  
+  
+  
 
   describe('logger integration', () => {
     it('logger.info is called when fetching page views', async () => {
@@ -1277,7 +1277,7 @@ describe('AnalyticsDataService', () => {
         lokiUrl: 'http://loki:3100',
         prometheusUrl: 'http://prom:9090',
         fetchLoki: mockFetch,
-        // no logger
+        
       });
       const svc = new AnalyticsDataService();
 
@@ -1303,9 +1303,9 @@ describe('AnalyticsDataService', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Additional edge cases
-  // -------------------------------------------------------------------------
+  
+  
+  
 
   describe('additional edge cases', () => {
     it('getPageViews handles very large page view counts', async () => {
@@ -1346,7 +1346,7 @@ describe('AnalyticsDataService', () => {
       mockFetch.mockResolvedValue(makeOkResponse(body));
       const svc = setupService(mockFetch, logger);
 
-      // s1 and 10.0.0.1 are different visitor IDs
+      
       const count = await svc.getUniqueVisitors();
       expect(count).toBe(2);
     });
@@ -1375,7 +1375,7 @@ describe('AnalyticsDataService', () => {
       mockFetch.mockResolvedValue(makeOkResponse(body));
       const svc = setupService(mockFetch, logger);
 
-      // Only s1 has sessionId: duration = 10s, 1 session => avg = 10
+      
       const duration = await svc.getAverageSessionDuration();
       expect(duration).toBe(10);
     });
@@ -1391,8 +1391,8 @@ describe('AnalyticsDataService', () => {
       mockFetch.mockResolvedValue(makeOkResponse(body));
       const svc = setupService(mockFetch, logger);
 
-      // 2 sessions with sessionId: multi (2 pages, not bounce), single (1 page, bounce)
-      // anon ignored (no sessionId)
+      
+      
       const rate = await svc.getBounceRate();
       expect(rate).toBe(50);
     });
@@ -1406,7 +1406,7 @@ describe('AnalyticsDataService', () => {
       const svc = setupService(mockFetch, logger);
 
       const sources = await svc.getTrafficSources();
-      // No sessionId means set stays empty => visits = 0
+      
       expect(sources).toContainEqual({ source: 'Google', visits: 0 });
     });
 
@@ -1447,7 +1447,7 @@ describe('AnalyticsDataService', () => {
       const svc = setupService(mockFetch, logger);
 
       const metrics = await svc.getAnalyticsMetrics();
-      // s1 = bounce, s2 = not bounce => 50%
+      
       expect(metrics.bounceRate).toBe(50);
     });
 
@@ -1517,7 +1517,7 @@ describe('AnalyticsDataService', () => {
           })
         );
       }
-      // Add a direct traffic entry
+      
       entries.push(pageViewEntry(ts - 12000, { session_id: 's12', referrer: '' }));
       const body = makeLokiResponse(entries);
       mockFetch.mockResolvedValue(makeOkResponse(body));
